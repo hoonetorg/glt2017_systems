@@ -1,0 +1,5 @@
+bash createconfigdrive salt.glt2017.org 512K
+bash createconfigdrive db1.glt2017.org 512K
+bash createconfigdrive db2.glt2017.org 512K
+bash createconfigdrive db3.glt2017.org 512K
+

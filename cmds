@@ -1,0 +1,14 @@
+for confdrive in confdrive/salt.glt2017.org/salt.glt2017.org.config.qcow2 confdrive/db1.glt2017.org/db1.glt2017.org.config.qcow2 confdrive/db2.glt2017.org/db2.glt2017.org.config.qcow2 confdrive/db3.glt2017.org/db3.glt2017.org.config.qcow2; do 
+  chown oneadmin:oneadmin $confdrive
+  ln -fs $confdrive .
+done
+
+
+if [ "$1" == "initialize" ]; then 
+  for osdrive in db1.glt2017.org.disk1.qcow2  db2.glt2017.org.disk1.qcow2  db3.glt2017.org.disk1.qcow2  salt.glt2017.org.disk1.qcow2; do
+    rm $osdrive
+    cp CentOS-7-x86_64-GenericCloud-1703.qcow2c $osdrive
+    qemu-img resize $osdrive 20G
+    chown oneadmin:oneadmin $osdrive
+  done
+fi

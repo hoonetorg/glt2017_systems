@@ -1,0 +1,11 @@
+dsmode: local
+instance-id: salt.glt2017.org
+local-hostname: salt.glt2017.org
+network-interfaces: |
+  iface eth0 inet static
+  address 192.168.124.101
+  network 192.168.124.0
+  netmask 255.255.255.0
+  broadcast 192.168.124.255
+  gateway 192.168.124.1
+  dns-nameservers 192.168.124.1

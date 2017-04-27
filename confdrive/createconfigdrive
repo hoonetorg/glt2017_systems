@@ -1,0 +1,73 @@
+#!/bin/bash
+PATH_SCRIPT="$(OLDPWD="`pwd`";cd "`dirname "$0"`";echo "`pwd`";cd "$OLDPWD")"
+DATE="`date +%Y-%m-%d_%H%M%S`"
+echo "PATH_SCRIPT: $PATH_SCRIPT"
+
+LABELUC="CIDATA"
+LABELLC="cidata"
+
+INSTANCE_ID="$1"
+[ -n "$INSTANCE_ID" ] || exit 1
+
+SIZE="$2"
+[ -n "$SIZE" ] || exit 1
+
+function createseedimage() {
+
+  IMAGEFILE="$1"
+  SIZE="$2"
+ 
+  [ -z "$2" ] && return 1
+
+  LABELUCHEX="$(echo -n "${LABELUC}" | xxd -g 0 -u -ps -c 256)"
+  LABELLCHEX="$(echo -n "${LABELLC}" | xxd -g 0 -u -ps -c 256)"
+
+  [ -f "${IMAGEFILE}" ] && rm "${IMAGEFILE}"
+  truncate --size ${SIZE} "${IMAGEFILE}"
+  mkfs.vfat -n ${LABELLC} "${IMAGEFILE}"
+
+  echo "Uppercase:"
+  hexdump -C "${IMAGEFILE}" | grep -i "${LABELLC}"
+
+  hexdump -ve '1/1 "%.2X"' "${IMAGEFILE}" | \
+  sed "s/${LABELUCHEX}/${LABELLCHEX}/g" | \
+  xxd -r -p > "${IMAGEFILE}.lowercase"
+  mv "${IMAGEFILE}.lowercase" "${IMAGEFILE}"
+
+  echo "Lowercase:"
+  hexdump -C "${IMAGEFILE}" | grep -i "${LABELLC}"
+}
+
+
+function main() {
+
+  [ ! -f "${PATH_SCRIPT}/vendor-data" ] && printf "#cloud-config\n" > "${PATH_SCRIPT}/vendor-data"
+  chmod 600 ${PATH_SCRIPT}/vendor-data
+
+
+  mkdir -p "${PATH_SCRIPT}/${INSTANCE_ID}"
+  cd "${PATH_SCRIPT}/${INSTANCE_ID}"
+
+  [ ! -f meta-data ] && { echo instance-id: ${INSTANCE_ID}; echo local-hostname: ${INSTANCE_ID}; } > meta-data
+
+  [ ! -f user-data ] && printf "#cloud-config\n" > user-data
+ 
+  [ ! -L vendor-data ] && ln -fs ../vendor-data .
+
+  chmod 600 user-data
+  chmod 600 meta-data
+
+  [ -f "${INSTANCE_ID}.config.iso" ] &&  rm ${INSTANCE_ID}.config.iso
+  genisoimage -input-charset utf-8 -output ${INSTANCE_ID}.config.iso -volid ${LABELLC} -joliet -rock -follow-links user-data meta-data vendor-data
+
+  createseedimage ${INSTANCE_ID}.config.img ${SIZE}
+  mcopy -oi ${INSTANCE_ID}.config.img user-data meta-data vendor-data ::
+
+  qemu-img convert -f raw -O qcow2 ${INSTANCE_ID}.config.img ${INSTANCE_ID}.config.qcow2
+  rm ${INSTANCE_ID}.config.img
+
+  cd "${OLDPWD}"
+}
+
+main 2>&1 |tee $PATH_SCRIPT/$INSTANCE_ID.$DATE.log
+

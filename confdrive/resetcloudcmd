@@ -1,0 +1,3 @@
+unlink /var/lib/cloud/instance
+rm -Rf /var/lib/cloud/instances/*
+echo "" > /etc/sudoers.d/90-cloud-init-users
