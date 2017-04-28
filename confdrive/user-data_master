@@ -62,3 +62,4 @@ runcmd:
   - yum -y remove epel-release
   - systemctl restart salt-master
   - salt-call -l debug state.sls salt.formulas,salt.master saltenv=glt2017
+  - salt-call -l debug state.highstate
