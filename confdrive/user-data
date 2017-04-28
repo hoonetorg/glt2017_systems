@@ -33,3 +33,5 @@ write_files:
 runcmd:
   - curl -L https://bootstrap.saltstack.com -o install_salt.sh && sh install_salt.sh -D -A salt.glt2017.org
   - yum -y remove epel-release
+  - echo "pcs cluster start" > /etc/rc.d/rc.local
+  - chmod +x /etc/rc.d/rc.local
