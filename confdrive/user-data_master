@@ -17,6 +17,7 @@ packages:
 bootcmd:
   - pgrep -a dhclient|grep eth0 && kill -9 $(pgrep -a dhclient|grep eth0|awk '{print $1}')
   - echo "nameserver 192.168.124.1" > /etc/resolv.conf
+  - setenforce 0
 
 write_files:
   - content: |
@@ -58,5 +59,6 @@ runcmd:
   - mkdir -p /srv/pillar        && cd /srv/pillar        && git clone https://github.com/hoonetorg/glt2017_pillar.git glt2017
   - mkdir -p /srv/salt          && cd /srv/salt          && git clone https://github.com/hoonetorg/glt2017_saltstate.git glt2017
   - curl -L https://bootstrap.saltstack.com -o install_salt.sh && sh install_salt.sh -D -M -A salt.glt2017.org
+  - yum -y remove epel-release
   - systemctl restart salt-master
   - salt-call -l debug state.sls salt.formulas,salt.master saltenv=glt2017

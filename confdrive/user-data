@@ -15,6 +15,7 @@ packages:
 bootcmd:
   - pgrep -a dhclient|grep eth0 && kill -9 $(pgrep -a dhclient|grep eth0|awk '{print $1}')
   - echo "nameserver 192.168.124.1" > /etc/resolv.conf
+  - setenforce 0
 
 write_files:
   - content: |
@@ -31,3 +32,4 @@ write_files:
 
 runcmd:
   - curl -L https://bootstrap.saltstack.com -o install_salt.sh && sh install_salt.sh -D -A salt.glt2017.org
+  - yum -y remove epel-release
