@@ -35,3 +35,5 @@ runcmd:
   - yum -y remove epel-release
   - echo "pcs cluster start" > /etc/rc.d/rc.local
   - chmod +x /etc/rc.d/rc.local
+  - echo -e '#!/bin/bash\npcs cluster start\n' > /var/lib/cloud/scripts/per-boot/pcs.sh
+  - chmod +x /var/lib/cloud/scripts/per-boot/pcs.sh
