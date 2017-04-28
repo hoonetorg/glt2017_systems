@@ -33,3 +33,5 @@ write_files:
 runcmd:
   - curl -L https://bootstrap.saltstack.com -o install_salt.sh && sh install_salt.sh -D -A salt.glt2017.org
   - yum -y remove epel-release
+  - echo "ipv6: False" > /etc/salt/minion.d/99-disable-ipv6.conf
+  - systemctl restart salt-minion
